@@ -217,7 +217,9 @@ void exec6502(uint32_t tickcount) {
 
         instructions++;
 
+#ifdef ENABLE_EXTERNAL_HOOKS
         if (callexternal) (*loopexternal)();
+#endif
     }
 }
 
@@ -242,7 +244,9 @@ void step6502() {
 
     instructions++;
 
+#ifdef ENABLE_EXTERNAL_HOOKS
     if (callexternal) (*loopexternal)();
+#endif
 }
 
 void hookexternal(void *funcptr) {

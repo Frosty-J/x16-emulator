@@ -1172,7 +1172,9 @@ handle_ieee_intercept()
 		return false;
 	}
 
+#ifndef FAST_IO_MODE
 	uint64_t base_ticks = SDL_GetPerformanceCounter();
+#endif
 
 	static int count_unlistn = 0;
 	bool handled = true;
@@ -1234,7 +1236,12 @@ handle_ieee_intercept()
 	if (handled) {
 		// Add the number CPU cycles equivalent to the amount of time that the operation actually took
 		// to prevent the emu from warping after a hostfs load
+#ifndef FAST_IO_MODE
 		clockticks6502 += (uint64_t)((SDL_GetPerformanceCounter() - base_ticks) * 1000000 * MHZ) / SDL_GetPerformanceFrequency();
+#else
+		// In fast mode, use a fixed penalty instead of measuring actual time
+		clockticks6502 += 1000; // Fixed penalty for host filesystem access
+#endif
 		if (s >= 0) {
 			if (!set_kernal_status(s)) {
 				printf("Warning: Could not set STATUS!\n");

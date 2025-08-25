@@ -3,6 +3,16 @@
 						Extracted from original single fake6502.c file
 
 */
+
+// Performance optimization: reduce page boundary checking in fast mode
+#ifdef FAST_BRANCH_MODE
+#define PAGE_BOUNDARY_CHECK(oldpc, newpc) clockticks6502++;
+#else
+#define PAGE_BOUNDARY_CHECK(oldpc, newpc) \
+    if ((oldpc & 0xFF00) != (newpc & 0xFF00)) clockticks6502 += 2; \
+    else clockticks6502++;
+#endif
+
 //
 //          65C02 changes.
 //
@@ -82,8 +92,7 @@ static void bcc() {
     if ((status & FLAG_CARRY) == 0) {
         oldpc = pc;
         pc += reladdr;
-        if ((oldpc & 0xFF00) != (pc & 0xFF00)) clockticks6502 += 2; //check if jump crossed a page boundary
-            else clockticks6502++;
+        PAGE_BOUNDARY_CHECK(oldpc, pc);
     }
 }
 
@@ -91,8 +100,7 @@ static void bcs() {
     if ((status & FLAG_CARRY) == FLAG_CARRY) {
         oldpc = pc;
         pc += reladdr;
-        if ((oldpc & 0xFF00) != (pc & 0xFF00)) clockticks6502 += 2; //check if jump crossed a page boundary
-            else clockticks6502++;
+        PAGE_BOUNDARY_CHECK(oldpc, pc);
     }
 }
 
@@ -100,8 +108,7 @@ static void beq() {
     if ((status & FLAG_ZERO) == FLAG_ZERO) {
         oldpc = pc;
         pc += reladdr;
-        if ((oldpc & 0xFF00) != (pc & 0xFF00)) clockticks6502 += 2; //check if jump crossed a page boundary
-            else clockticks6502++;
+        PAGE_BOUNDARY_CHECK(oldpc, pc);
     }
 }
 
@@ -117,8 +124,7 @@ static void bmi() {
     if ((status & FLAG_SIGN) == FLAG_SIGN) {
         oldpc = pc;
         pc += reladdr;
-        if ((oldpc & 0xFF00) != (pc & 0xFF00)) clockticks6502 += 2; //check if jump crossed a page boundary
-            else clockticks6502++;
+        PAGE_BOUNDARY_CHECK(oldpc, pc);
     }
 }
 
@@ -126,8 +132,7 @@ static void bne() {
     if ((status & FLAG_ZERO) == 0) {
         oldpc = pc;
         pc += reladdr;
-        if ((oldpc & 0xFF00) != (pc & 0xFF00)) clockticks6502 += 2; //check if jump crossed a page boundary
-            else clockticks6502++;
+        PAGE_BOUNDARY_CHECK(oldpc, pc);
     }
 }
 
@@ -135,8 +140,7 @@ static void bpl() {
     if ((status & FLAG_SIGN) == 0) {
         oldpc = pc;
         pc += reladdr;
-        if ((oldpc & 0xFF00) != (pc & 0xFF00)) clockticks6502 += 2; //check if jump crossed a page boundary
-            else clockticks6502++;
+        PAGE_BOUNDARY_CHECK(oldpc, pc);
     }
 }
 
@@ -155,8 +159,7 @@ static void bvc() {
     if ((status & FLAG_OVERFLOW) == 0) {
         oldpc = pc;
         pc += reladdr;
-        if ((oldpc & 0xFF00) != (pc & 0xFF00)) clockticks6502 += 2; //check if jump crossed a page boundary
-            else clockticks6502++;
+        PAGE_BOUNDARY_CHECK(oldpc, pc);
     }
 }
 
@@ -164,8 +167,7 @@ static void bvs() {
     if ((status & FLAG_OVERFLOW) == FLAG_OVERFLOW) {
         oldpc = pc;
         pc += reladdr;
-        if ((oldpc & 0xFF00) != (pc & 0xFF00)) clockticks6502 += 2; //check if jump crossed a page boundary
-            else clockticks6502++;
+        PAGE_BOUNDARY_CHECK(oldpc, pc);
     }
 }
 

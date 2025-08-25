@@ -33,6 +33,11 @@ ifdef TRACE
 	CFLAGS+=-D TRACE
 endif
 
+# Performance optimizations - enable by default for better user experience
+ifndef DISABLE_FAST_MODE
+	CFLAGS+=-D FAST_IO_MODE -D FAST_BRANCH_MODE
+endif
+
 X16_OUTPUT=x16emu
 MAKECART_OUTPUT=makecart
 

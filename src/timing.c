@@ -43,7 +43,7 @@ timing_update()
 		usleep(diff_time);
 	}
 
-	if (sdlTicks - last_perf_update > 5000) {
+	if (sdlTicks - last_perf_update > 10000) { // Update every 10 seconds instead of 5 for better performance
 		uint32_t perf = (cpu_ticks - last_perf_cpu_ticks) / (MHZ * 50000);
 
 		if (perf < 100 || warp_mode) {

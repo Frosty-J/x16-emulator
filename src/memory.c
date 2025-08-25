@@ -142,7 +142,11 @@ real_read6502(uint16_t address, bool debugOn, uint8_t bank)
 	} else if (address < 0xa000) { // I/O
 		if (!debugOn && address >= 0x9fa0) {
 			// slow IO6-8 range
+#ifndef FAST_IO_MODE
 			clockticks6502 += 3;
+#else
+			clockticks6502 += 1; // Reduced penalty for better performance
+#endif
 		}
 		if (address >= 0x9f00 && address < 0x9f10) {
 			return via1_read(address & 0xf, debugOn);
@@ -153,7 +157,11 @@ real_read6502(uint16_t address, bool debugOn, uint8_t bank)
 		} else if (address >= 0x9f40 && address < 0x9f60) {
 			// slow IO3 range
 			if (!debugOn) {
+#ifndef FAST_IO_MODE
 				clockticks6502 += 3;
+#else
+				clockticks6502 += 1; // Reduced penalty for better performance
+#endif
 			}
 			return 0;
 		} else if (address >= 0x9fb0 && address < 0x9fc0) {
@@ -206,7 +214,11 @@ write6502(uint16_t address, uint8_t value)
 	} else if (address < 0xa000) { // I/O
 		if (address >= 0x9fa0) {
 			// slow IO6-8 range
+#ifndef FAST_IO_MODE
 			clockticks6502 += 3;
+#else
+			clockticks6502 += 1; // Reduced penalty for better performance
+#endif
 		}
 		if (address >= 0x9f00 && address < 0x9f10) {
 			via1_write(address & 0xf, value);
@@ -216,7 +228,11 @@ write6502(uint16_t address, uint8_t value)
 			video_write(address & 0x1f, value);
 		} else if (address >= 0x9f40 && address < 0x9f60) {
 			// slow IO3 range
+#ifndef FAST_IO_MODE
 			clockticks6502 += 3;
+#else
+			clockticks6502 += 1; // Reduced penalty for better performance
+#endif
 			if (address == 0x9f40) {        // YM address
 				addr_ym = value;
 			} else if (address == 0x9f41) { // YM data

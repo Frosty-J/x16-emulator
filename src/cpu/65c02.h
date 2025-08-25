@@ -61,7 +61,11 @@ static void stz() {
 static void bra() {
     oldpc = pc;
     pc += reladdr;
+#ifdef FAST_BRANCH_MODE
+    clockticks6502++; // Always single cycle in fast mode
+#else
     if ((oldpc & 0xFF00) != (pc & 0xFF00)) clockticks6502++; //check if jump crossed a page boundary
+#endif
 }
 
 // *******************************************************************************************
@@ -144,8 +148,7 @@ static void bbr(uint16_t bitmask)
 	if ((getvalue() & bitmask) == 0) {
 		oldpc = pc;
 		pc += reladdr;
-		if ((oldpc & 0xFF00) != (pc & 0xFF00)) clockticks6502 += 2; //check if jump crossed a page boundary
-		else clockticks6502++;
+		PAGE_BOUNDARY_CHECK(oldpc, pc);
 	}
 }
 
@@ -163,8 +166,7 @@ static void bbs(uint16_t bitmask)
 	if ((getvalue() & bitmask) != 0) {
 		oldpc = pc;
 		pc += reladdr;
-		if ((oldpc & 0xFF00) != (pc & 0xFF00)) clockticks6502 += 2; //check if jump crossed a page boundary
-		else clockticks6502++;
+		PAGE_BOUNDARY_CHECK(oldpc, pc);
 	}
 }
 
